@@ -235,17 +235,16 @@ $.inverse = style => ` ${style}`
     .replace(/( +)(\D?)(\d+)/g, (s, s1, s2, s3) => `${s1}${s2 === '-' ? '+' : '-'}${s3}`)
     .replace(/^ /, '');
 
-$.extend = () => arguments[0] == null
-    ? arguments[0]
-    : [...arguments]
-        .reduce((res, ext) => ext == null
-            ? res
-            : Object.keys(ext)
-                .reduce((res, key) => {
-                    res[key] = ext[key];
-                    return res;
-                }, res)
-        );
+$.extend = (...objs) => objs[0] == null
+    ? objs[0]
+    : objs.reduce((res, ext) => ext == null
+        ? res
+        : Object.keys(ext)
+            .reduce((res, key) => {
+                res[key] = ext[key];
+                return res;
+            }, res)
+    );
 
 $.instance = val => Object.prototype.toString.call(val).slice(8, -1);
 

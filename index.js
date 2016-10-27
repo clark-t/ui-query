@@ -206,10 +206,12 @@ function $(elem, root) {
 }
 
 $.stringify = styleObject => Object.keys(styleObject)
+    .filter(key => !key || styleObject[key] != null)
     .reduce((res, key) => `${res}${$.dasherize(key)}:${styleObject[key]};`, '');
 
 $.parse = styleString => styleString.trim()
-    .replace(/ +(;|:) +/g, '$1')
+    .replace(/ *(;|:) */g, '$1')
+    .replace(/;$/, '')
     .split(';')
     .filter(style => !!style)
     .reduce((res, style) => {
@@ -250,4 +252,4 @@ $.instance = val => Object.prototype.toString.call(val).slice(8, -1);
 
 $.getDom = elem => elem instanceof EL ? elem.dom : elem;
 
-export default $;
+module.exports = $;

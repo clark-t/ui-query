@@ -1,6 +1,6 @@
 {
   "name": "ui-query",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "a lite jquery-like tools for my own project.",
   "scripts": {
     "build": "node ./node_modules/webpack/bin/webpack --config webpack.config.js -p",

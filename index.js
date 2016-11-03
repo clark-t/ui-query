@@ -25,7 +25,7 @@ class EL {
         return $(this.dom.parentNode);
     }
 
-    attr() {
+    attr(val) {
         if (val == null) {
             return this.dom.getAttribute(name);
         }
@@ -145,7 +145,8 @@ class EL {
     addClass(val) {
         this.dom.className = val.trim()
             .split(' ')
-            .reduce((res, name) => res.indexOf(name) > -1 ? res : `${res} ${name}`,
+            .reduce(
+                (res, name) => res.indexOf(name) > -1 ? res : `${res} ${name}`,
                 this.dom.className.trim()
             );
         return this;
@@ -200,9 +201,7 @@ class EL {
 }
 
 function $(elem, root) {
-    return elem instanceof EL
-        ? elem
-        : new EL(elem, root);
+    return elem instanceof EL ? elem : new EL(elem, root);
 }
 
 $.stringify = styleObject => Object.keys(styleObject)
@@ -252,4 +251,4 @@ $.instance = val => Object.prototype.toString.call(val).slice(8, -1);
 
 $.getDom = elem => elem instanceof EL ? elem.dom : elem;
 
-module.exports = $;
+export default $;

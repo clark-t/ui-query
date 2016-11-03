@@ -6,6 +6,8 @@
 class EL {
     constructor(elem, root) {
         if (typeof elem === 'string') {
+            elem = elem.trim();
+
             if (elem.slice(0, 1) === '<' && elem.slice(-1) === '>') {
                 let ele = document.createElement('div');
                 ele.innerHTML = elem;

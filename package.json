@@ -27,7 +27,7 @@
   "keywords": [
     "jquery-like"
   ],
-  "main": "dist/boolean.min.js",
+  "main": "dist/ui-query.min.js",
   "directories": {
     "test": "tests"
   }

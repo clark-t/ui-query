@@ -6,8 +6,8 @@
 class EL {
     constructor(elem, root) {
         if (typeof elem === 'string') {
-            if (elem.slice(0, 1) === '<' && elem.slice(-1) === '>') {
-                var ele = document.createElement('div');
+            if (/^<.+>$/.test(elem)) {
+                let ele = document.createElement('div');
                 ele.innerHTML = elem;
                 elem = ele.children[0];
             }
@@ -113,30 +113,26 @@ class EL {
     }
 
     setStyle(val) {
-        var styleObj = $.parse(this.attr('style') || '');
-        styleObj = Object.keys(val)
-            .reduce((res, key) => {
-                    res[key] = val[key];
-                    return res;
-                },
-                styleObj
+        let styleObj = Object.keys(val)
+            .reduce(
+                (res, key) => setKey(res, key, val[key]),
+                $.parse(this.attr('style') || '')
             );
-
         this.attr('style', $.stringify(styleObj));
         return this;
     }
 
     getStyle(val) {
-        return val.reduce((res, name) => {
-            res[name] = this.computed[name];
-            return res;
-        }, {});
+        return val.reduce(
+            (res, name) => setKey(res, name, this.computed[name]),
+            {}
+        );
     }
 
     removeStyle(exclude) {
         exclude = typeof exclude === 'string' ? [exclude] : exclude;
-        var styleObj = $.parse(this.attr('style') || '');
-        var styleStr = Object.keys(styleObj)
+        let styleObj = $.parse(this.attr('style') || '');
+        let styleStr = Object.keys(styleObj)
             .filter(key => exclude.indexOf(key) === -1)
             .reduce((res, key) => `${res}${key}:${styleObj[key]};`, '');
 
@@ -147,14 +143,15 @@ class EL {
     addClass(val) {
         this.dom.className = val.trim()
             .split(' ')
-            .reduce((res, name) => res.indexOf(name) > -1 ? res : `${res} ${name}`,
+            .reduce(
+                (res, name) => (res.indexOf(name) > -1 ? res : `${res} ${name}`),
                 this.dom.className.trim()
             );
         return this;
     }
 
     removeClass(val) {
-        var classText = ` ${this.dom.className} `;
+        let classText = ` ${this.dom.className} `;
 
         if (/^ *$/.test(classText)) {
             return this;
@@ -169,7 +166,7 @@ class EL {
 
     insertAfter(elem) {
         elem = $.getDom(elem);
-        var parent = elem.parentNode;
+        let parent = elem.parentNode;
 
         if (parent.lastChild === elem) {
             parent.appendChild(this.dom);
@@ -189,7 +186,7 @@ class EL {
 
     replaceWith(elem) {
         elem = $.getDom(elem);
-        var parent = this.dom.parentNode;
+        let parent = this.dom.parentNode;
         parent.replaceChild(elem, this.dom);
         return this;
     }
@@ -214,11 +211,7 @@ $.parse = styleString => styleString.trim()
     .replace(/;$/, '')
     .split(';')
     .filter(style => !!style)
-    .reduce((res, style) => {
-        style = style.split(':');
-        res[style[0]] = style[1];
-        return res;
-    }, {});
+    .reduce((res, style) => setKey(res, ...style.split(':')), {});
 
 
 $.dasherize = str => str.replace(/::/g, '/')
@@ -227,29 +220,35 @@ $.dasherize = str => str.replace(/::/g, '/')
     .replace(/_/g, '-')
     .toLowerCase();
 
-$.prefix = (name, value) => ['', '-webkit-']
-    .reduce((res, prefix) => {
-        res[prefix + name] = value;
-        return res;
-    }, {});
+$.prefix = (name, value) => ['', '-webkit-'].reduce(
+    (res, prefix) => setKey(res, `${prefix}${name}`, value),
+    {}
+);
 
 $.inverse = style => ` ${style}`
     .replace(/( +)(\D?)(\d+)/g, (s, s1, s2, s3) => `${s1}${s2 === '-' ? '+' : '-'}${s3}`)
     .replace(/^ /, '');
 
-$.extend = (...objs) => objs[0] == null
+$.extend = (...objs) => (
+    objs[0] == null
     ? objs[0]
-    : objs.reduce((res, ext) => ext == null
-        ? res
-        : Object.keys(ext)
-            .reduce((res, key) => {
-                res[key] = ext[key];
-                return res;
-            }, res)
-    );
+    : objs.reduce(
+        (res, ext) => (
+            ext == null
+            ? res
+            : Object.keys(ext)
+                .reduce((res, key) => setKey(res, key, ext[key]), res)
+        )
+    )
+);
 
 $.instance = val => Object.prototype.toString.call(val).slice(8, -1);
 
-$.getDom = elem => elem instanceof EL ? elem.dom : elem;
+$.getDom = elem => (elem instanceof EL ? elem.dom : elem);
+
+function setKey(obj, key, value) {
+    obj[key] = value;
+    return obj;
+}
 
 export default $;

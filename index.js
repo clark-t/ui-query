@@ -25,7 +25,7 @@ class EL {
         return $(this.dom.parentNode);
     }
 
-    attr(val) {
+    attr(name, val) {
         if (val == null) {
             return this.dom.getAttribute(name);
         }
@@ -116,9 +116,11 @@ class EL {
         var styleObj = $.parse(this.attr('style') || '');
         styleObj = Object.keys(val)
             .reduce((res, key) => {
-                res[key] = val[key];
-                return res;
-            }, styleObj);
+                    res[key] = val[key];
+                    return res;
+                },
+                styleObj
+            );
 
         this.attr('style', $.stringify(styleObj));
         return this;
@@ -145,8 +147,7 @@ class EL {
     addClass(val) {
         this.dom.className = val.trim()
             .split(' ')
-            .reduce(
-                (res, name) => res.indexOf(name) > -1 ? res : `${res} ${name}`,
+            .reduce((res, name) => res.indexOf(name) > -1 ? res : `${res} ${name}`,
                 this.dom.className.trim()
             );
         return this;

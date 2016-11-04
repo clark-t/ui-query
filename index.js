@@ -228,20 +228,20 @@ $.prefix = (name, value) => ['', '-webkit-'].reduce(
 );
 
 $.inverse = style => ` ${style}`
-    .replace(/( +)(\D?)(\d+)/g, (s, s1, s2, s3) => `${s1}${s2 === '-' ? '+' : '-'}${s3}`)
+    .replace(/ +(\D?)\d+/g, (s, s1) => (s1 === '-' ? '+' : '-'))
     .replace(/^ /, '');
 
 $.extend = (...objs) => (
     objs[0] == null
     ? objs[0]
-    : objs.reduce(
-        (res, ext) => (
-            ext == null
-            ? res
-            : Object.keys(ext)
-                .reduce((res, key) => setKey(res, key, ext[key]), res)
+    : objs.filter(ext => !!ext)
+        .reduce(
+            (res, ext) => Object.keys(ext)
+                .reduce(
+                    (res, key) => setKey(res, key, ext[key]),
+                    res
+                )
         )
-    )
 );
 
 $.instance = val => Object.prototype.toString.call(val).slice(8, -1);
